@@ -1,0 +1,28 @@
+name: Example workflow
+
+on:
+  push:
+    branches:
+      - main
+      - cicd
+    paths:
+      - common/nfs-data/**
+  workflow_dispatch: 
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: 'Install pmtiles'
+        run: |
+          pip install pmtiles
+      - name: 'Convert mbtiles'
+        run: |
+          curl -L https://github.com/jxeeno/admin-boundaries-mbtiles/releases/download/GNAF-2022-02/gnaf.ACT.mbtiles.gz | gunzip | gnaf.ACT.mbtiles
+          time pmtiles-convert gnaf.ACT.mbtiles gnaf.ACT.pmtiles
+          ls -lah
