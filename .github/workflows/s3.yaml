@@ -36,9 +36,15 @@ jobs:
           INPUT_FILENAME: ${{ github.event.inputs.key }}
         run: |
           export OUTPUT_FILENAME="$(echo $INPUT_FILENAME | sed 's/.mbtiles//').pmtiles"
-          echo "Downloading $INPUT_FILENAME and converting to $OUTPUT_FILENAME"
-          aws s3api get-object --bucket $S3_BUCKET_NAME --endpoint-url $S3_ENDPOINT_URL --key $INPUT_FILENAME in.mbtiles
+          echo "Summary: This action downloads $INPUT_FILENAME from S3, converts to pmtiles and and uploads as $OUTPUT_FILENAME"
+          echo "Status: Downloading $INPUT_FILENAME from S3"
+          time aws s3api get-object --bucket $S3_BUCKET_NAME --endpoint-url $S3_ENDPOINT_URL --key $INPUT_FILENAME in.mbtiles
+          echo "Status: Downloaded $INPUT_FILENAME from S3"
           ls -lah
+          echo "Status: Converting $INPUT_FILENAME to $OUTPUT_FILENAME"
           time pmtiles-convert in.mbtiles out.pmtiles
+          echo "Status: PMTiles conversion completed"
           ls -lah
-          aws s3api put-object --bucket $S3_BUCKET_NAME --endpoint-url $S3_ENDPOINT_URL --key $OUTPUT_FILENAME --body out.pmtiles
+          echo "Status: Uploading $OUTPUT_FILENAME to S3"
+          time aws s3api put-object --bucket $S3_BUCKET_NAME --endpoint-url $S3_ENDPOINT_URL --key $OUTPUT_FILENAME --body out.pmtiles
+          echo "Status: Uploaded $OUTPUT_FILENAME to S3"
