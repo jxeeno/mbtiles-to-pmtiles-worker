@@ -1,0 +1,38 @@
+name: S3 Workflow
+
+on:
+  workflow_dispatch: 
+    inputs:
+      key:
+        description: 'Key'
+        required: true
+        default: 'ABSPOA.mbtiles'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: 'Install pmtiles'
+        run: |
+          pip install pmtiles
+      - name: 'Convert mbtiles'
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
+          S3_BUCKET_NAME: ${{ secrets.S3_BUCKET_NAME }}
+          S3_ENDPOINT_URL: ${{ secrets.S3_ENDPOINT_URL }}
+          INPUT_FILENAME: ${{ github.event.inputs.key }}
+        run: |
+          export OUTPUT_FILENAME="$(echo $INPUT_FILENAME | sed 's/.mbtiles//').pmtiles"
+          echo "Downloading $INPUT_FILENAME and converting to $OUTPUT_FILENAME"
+          aws s3api get-object --bucket $S3_BUCKET_NAME --endpoint-url $S3_ENDPOINT_URL --key $INPUT_FILENAME in.mbtiles
+          ls -lah
+          time pmtiles-convert in.mbtiles out.pmtiles
+          ls -lah
+          aws s3api put-object --bucket $S3_BUCKET_NAME --endpoint-url $S3_ENDPOINT_URL --key out.pmtiles --body $OUTPUT_FILENAME
