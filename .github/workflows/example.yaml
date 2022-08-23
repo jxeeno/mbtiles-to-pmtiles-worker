@@ -23,6 +23,6 @@ jobs:
           pip install pmtiles
       - name: 'Convert mbtiles'
         run: |
-          curl -L https://github.com/jxeeno/admin-boundaries-mbtiles/releases/download/GNAF-2022-02/gnaf.ACT.mbtiles.gz | gunzip | gnaf.ACT.mbtiles
+          curl -L https://github.com/jxeeno/admin-boundaries-mbtiles/releases/download/GNAF-2022-02/gnaf.ACT.mbtiles.gz | gunzip > gnaf.ACT.mbtiles
           time pmtiles-convert gnaf.ACT.mbtiles gnaf.ACT.pmtiles
           ls -lah
