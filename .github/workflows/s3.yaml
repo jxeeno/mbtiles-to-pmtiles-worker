@@ -35,4 +35,4 @@ jobs:
           ls -lah
           time pmtiles-convert in.mbtiles out.pmtiles
           ls -lah
-          aws s3api put-object --bucket $S3_BUCKET_NAME --endpoint-url $S3_ENDPOINT_URL --key out.pmtiles --body $OUTPUT_FILENAME
+          aws s3api put-object --bucket $S3_BUCKET_NAME --endpoint-url $S3_ENDPOINT_URL --key $OUTPUT_FILENAME --body out.pmtiles
